@@ -1,11 +1,10 @@
+package ru.n_korotkov.oop.filesearch;
+
 import java.util.ArrayList;
-import java.util.List;
 import java.io.IOException;
 import java.io.FileReader;
 import java.io.FileNotFoundException;
-import java.io.FileInputStream;
 import java.io.BufferedReader;
-import java.io.BufferedInputStream;
 
 public class Main {
 
@@ -14,14 +13,11 @@ public class Main {
      * @param arr the <code>long[]</code> to be printed
      */
     public static void printArray(long[] arr) {
-        System.out.print("{");
-        if (arr.length > 0) {
-            System.out.printf(" %d", arr[0]);
+        String[] stringArr = new String[arr.length];
+        for (int i = 0; i < arr.length; i++) {
+            stringArr[i] = Long.toString(arr[i]);
         }
-        for (int i = 1; i < arr.length; i++) {
-            System.out.printf(", %d", arr[i]);
-        }
-        System.out.printf(" }%n");
+        System.out.printf("{ %s }%n", String.join(", ", stringArr));
     }
 
     private static final long P = 771645345, M = 1073741789;
@@ -56,7 +52,7 @@ public class Main {
         final int[] searchChars = searchString.codePoints().toArray();
         final long searchHash = rollingHash(searchString);
         final int searchSize = searchString.length();
-        ArrayList<Long> foundSubstrings = new ArrayList<Long>();
+        ArrayList<Long> foundSubstrings = new ArrayList<>();
 
         BufferedReader inputStream = new BufferedReader(new FileReader(filename));
         long fileCursor = 0, substringHash = 0;
@@ -100,6 +96,7 @@ public class Main {
     }
 
     public static void main(String[] args) {
+        System.out.println("Stup");
         if (args.length != 2) {
             System.out.println("Usage: java Main <filename> <search-string>");
             return;

@@ -23,5 +23,5 @@ tasks.named('test') {
 }
 
 application {
-    mainClass = 'Main'
+    mainClass = 'ru.n_korotkov.oop.filesearch.Main'
 }
