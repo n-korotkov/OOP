@@ -96,7 +96,6 @@ public class Main {
     }
 
     public static void main(String[] args) {
-        System.out.println("Stup");
         if (args.length != 2) {
             System.out.println("Usage: java Main <filename> <search-string>");
             return;
