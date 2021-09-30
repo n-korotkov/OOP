@@ -14,17 +14,21 @@ public class MaxHeap {
      * @param capacity
      */
     public MaxHeap(int capacity) {
+        if (capacity < 0)
+            throw new IllegalArgumentException("Capacity must not be negative");
+
         data = new int[capacity];
     }
 
     /**
-     * Constructs a heap from <code>arr</code>.
-     * The resulting <code>MaxHeap</code> contains all the elements of <code>arr</code> and
-     * occupies <code>arr</code> to store them.
+     * Constructs a heap containing all the elements of <code>arr</code>.
      * @param arr the array to heapify
      */
     public MaxHeap(int[] arr) {
-        data = arr;
+        if (arr == null)
+            throw new IllegalArgumentException("Input array must not be null");
+
+        data = arr.clone();
         size = arr.length;
         for (int index = size / 2 - 1; index >= 0; index--) {
             siftDown(index);
@@ -83,6 +87,9 @@ public class MaxHeap {
      * @param value
      */
     public void insert(int value) {
+        if (size == data.length)
+            throw new IllegalStateException("This heap is full");
+
         data[size] = value;
         siftUp(size);
         size++;
@@ -93,11 +100,28 @@ public class MaxHeap {
      * @return the extracted element
      */
     public int extract() {
+        if (size == 0)
+            throw new IllegalStateException("This heap is empty");
+
         size--;
         int value = data[0];
         data[0] = data[size];
         siftDown(0);
         return value;
+    }
+
+    /**
+     * Returns the sorted array holding the elements of this heap.
+     * The heap should not be used afterwards.
+     * @return the sorted array containing all the elements of this heap
+     */
+    public int[] sort() {
+        while (size > 0) {
+            size--;
+            swap(0, size);
+            siftDown(0);
+        }
+        return data;
     }
 
 }
