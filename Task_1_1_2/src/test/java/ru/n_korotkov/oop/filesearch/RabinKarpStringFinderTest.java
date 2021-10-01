@@ -1,6 +1,7 @@
 package ru.n_korotkov.oop.filesearch;
 
 import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.BeforeAll;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.Arguments;
 import org.junit.jupiter.params.provider.MethodSource;
@@ -17,6 +18,13 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 class RabinKarpStringFinderTest {
+
+    private static RabinKarpStringFinder subjectStringFinder;
+
+    @BeforeAll
+    static void initStringFinder() {
+        subjectStringFinder = new RabinKarpStringFinder();
+    }
 
     static ArrayList<Long> simpleSearch(String filename, String searchQuery) {
         ArrayList<Long> searchResult = new ArrayList<>();
@@ -57,8 +65,7 @@ class RabinKarpStringFinderTest {
         ArrayList<Long> searchResult = simpleSearch(filename, searchQuery);
 
         try (BufferedReader inputStream = new BufferedReader(new FileReader(filename, StandardCharsets.UTF_8))) {
-            RabinKarpStringFinder stringFinder = new RabinKarpStringFinder();
-            ArrayList<Long> rabinKarpSearchResult = stringFinder.search(inputStream, searchQuery);
+            ArrayList<Long> rabinKarpSearchResult = subjectStringFinder.search(inputStream, searchQuery);
             assertEquals(rabinKarpSearchResult, searchResult);
         } catch (Exception e) {
             fail(e);
@@ -69,8 +76,7 @@ class RabinKarpStringFinderTest {
     @MethodSource("fileSearchIllegalArgumentsProvider")
     void rabinKarpIllegalSearchQueryTest(String filename, String searchQuery) {
         try (BufferedReader inputStream = new BufferedReader(new FileReader(filename, StandardCharsets.UTF_8))) {
-            RabinKarpStringFinder stringFinder = new RabinKarpStringFinder();
-            assertThrows(IllegalArgumentException.class, () -> stringFinder.search(inputStream, searchQuery));
+            assertThrows(IllegalArgumentException.class, () -> subjectStringFinder.search(inputStream, searchQuery));
         } catch (Exception e) {
             fail(e);
         }
@@ -78,8 +84,7 @@ class RabinKarpStringFinderTest {
 
     @Test
     void rabinKarpIllegalReaderTest() {
-        RabinKarpStringFinder stringFinder = new RabinKarpStringFinder();
-        assertThrows(IllegalArgumentException.class, () -> stringFinder.search(null, "unused"));
+        assertThrows(IllegalArgumentException.class, () -> subjectStringFinder.search(null, "unused"));
     }
 
 }
