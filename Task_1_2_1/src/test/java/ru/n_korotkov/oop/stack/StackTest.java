@@ -29,7 +29,7 @@ class StackTest {
 
         ).map(arr -> {
             List<Integer> l = new ArrayList<>(Arrays.asList(arr));
-            return arguments(l, new Stack<Integer>(l));
+            return arguments(l, new Stack<Integer>(Integer.class, l));
         });
     }
 
@@ -55,15 +55,15 @@ class StackTest {
         ).map(pair -> {
             List<Integer> l1 = new ArrayList<>(Arrays.asList(pair[0]));
             List<Integer> l2 = new ArrayList<>(Arrays.asList(pair[1]));
-            return arguments(l1, new Stack<>(l1), l2, new Stack<>(l2));
+            return arguments(l1, new Stack<>(Integer.class, l1), l2, new Stack<>(Integer.class, l2));
         });
 
     }
 
     @ParameterizedTest
     @MethodSource("singleStackParameterProvider")
-    void countTest(List<Integer> elements, Stack<Integer> stack) {
-        assertEquals(elements.size(), stack.count());
+    void sizeTest(List<Integer> elements, Stack<Integer> stack) {
+        assertEquals(elements.size(), stack.size());
     }
 
     @ParameterizedTest
@@ -81,7 +81,7 @@ class StackTest {
         elements.remove(lastIndex);
         
         assertEquals(lastElement, stackLastElement);
-        assertEquals(elements.size(), stack.count());
+        assertEquals(elements.size(), stack.size());
         assertIterableEquals(elements, stack.toList());
     }
 
@@ -92,7 +92,7 @@ class StackTest {
         stack.push(elem);
         elements.add(elem);
         
-        assertEquals(elements.size(), stack.count());
+        assertEquals(elements.size(), stack.size());
         assertIterableEquals(elements, stack.toList());
     }
 
@@ -101,8 +101,8 @@ class StackTest {
     void stackPopTest(List<Integer> elements, Stack<Integer> stack) {
         int popSize = elements.size() / 2;
         Stack<Integer> poppedStack = stack.popStack(popSize);
-        assertEquals(elements.size() - popSize, stack.count());
-        assertEquals(popSize, poppedStack.count());
+        assertEquals(elements.size() - popSize, stack.size());
+        assertEquals(popSize, poppedStack.size());
 
         List<Integer> remainingElements = elements.subList(0, elements.size() - popSize);
         List<Integer> poppedElements = elements.subList(elements.size() - popSize, elements.size());
@@ -114,7 +114,7 @@ class StackTest {
     @MethodSource("stackPairParameterProvider")
     void stackPushTest(List<Integer> elements, Stack<Integer> stack, List<Integer> pushedElements, Stack<Integer> pushedStack) {
         stack.pushStack(pushedStack);
-        assertEquals(elements.size() + pushedElements.size(), stack.count());
+        assertEquals(elements.size() + pushedElements.size(), stack.size());
 
         elements.addAll(pushedElements);
         assertIterableEquals(elements, stack.toList());
@@ -123,29 +123,29 @@ class StackTest {
     @Test
     void growTest() {
         int bound = 1000;
-        Stack<Integer> stack = new Stack<>(0);
+        Stack<Integer> stack = new Stack<>(Integer.class, 0);
         for (int i = 0; i < bound; i++) {
             stack.push(i);
         }
-        assertEquals(bound, stack.count());
+        assertEquals(bound, stack.size());
         assertIterableEquals(IntStream.range(0, bound).boxed().collect(Collectors.toList()), stack.toList());
     }
 
     @Test
     void negativeCapacityStackThrows() {
-        assertThrows(IllegalArgumentException.class, () -> new Stack<Object>(-1));
+        assertThrows(IllegalArgumentException.class, () -> new Stack<Object>(Object.class, -1));
     }
 
     @Test
     void popFromEmptyStackThrows() {
-        Stack<Object> stack = new Stack<>();
-        assertEquals(0, stack.count());
+        Stack<Object> stack = new Stack<>(Object.class);
+        assertEquals(0, stack.size());
         assertThrows(IllegalStateException.class, stack::pop);
     }
 
     @Test
     void popStackFromShortStackThrows() {
-        Stack<Integer> stack = new Stack<>(Arrays.asList(1, 2, 3));
+        Stack<Integer> stack = new Stack<>(Integer.class, Arrays.asList(1, 2, 3));
         assertThrows(IllegalStateException.class, () -> stack.popStack(5));
     }
 
