@@ -3,26 +3,26 @@ package ru.n_korotkov.oop.stack;
 class Main {
 
     public static void main(String[] args) {
-        Stack<Integer> steak1 = new Stack<>(), stack2 = new Stack<>();
+        Stack<Integer> stack1 = new Stack<>(Integer.class), stack2 = new Stack<>(Integer.class);
         stack2.push(4);
         stack2.push(8);
 
-        steak1.push(2);
-        System.out.println(steak1);
+        stack1.push(2);
+        System.out.println(stack1);
 
-        steak1.push(7);
-        System.out.println(steak1);
+        stack1.push(7);
+        System.out.println(stack1);
 
-        steak1.pushStack(stack2);
-        System.out.println(steak1);
+        stack1.pushStack(stack2);
+        System.out.println(stack1);
 
-        steak1.pop();
-        System.out.println(steak1);
+        stack1.pop();
+        System.out.println(stack1);
 
-        steak1.popStack(2);
-        System.out.println(steak1);
+        stack1.popStack(2);
+        System.out.println(stack1);
 
-        System.out.printf("steak1.count() == %d%n", steak1.count());
+        System.out.printf("stack1.size() == %d%n", stack1.size());
 
     }
 

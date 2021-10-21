@@ -1,5 +1,6 @@
 package ru.n_korotkov.oop.stack;
 
+import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
@@ -9,37 +10,45 @@ import java.util.List;
  */
 class Stack<T> {
 
-    private final int DEFAULT_CAPACITY = 16;
-    private final int GROW_FACTOR = 2;
+    private static final int DEFAULT_CAPACITY = 16;
+    private static final int GROW_FACTOR = 2;
 
     private int size = 0;
     private T[] data;
 
-    /**
-     * Constructs a stack of default capacity.
-     */
-    public Stack() {
-        data = (T[]) new Object[DEFAULT_CAPACITY];
-    }
+    private final Class<?> elementType;
 
     /**
      * Constructs a stack of given capacity.
+     * @param type the component type of the new stack
      * @param capacity the capacity of the new stack
      */
-    public Stack(int capacity) {
+    @SuppressWarnings("unchecked")
+    public Stack(Class<?> type, int capacity) {
         if (capacity < 0)
             throw new IllegalArgumentException("Given capacity is negative");
 
-        data = (T[]) new Object[capacity];
+        this.elementType = type;
+        data = (T[]) Array.newInstance(this.elementType, capacity);
+    }
+
+    /**
+     * Constructs a stack of default capacity.
+     * @param type the component type of the new stack
+     */
+    public Stack(Class<?> type) {
+        this(type, DEFAULT_CAPACITY);
     }
 
     /**
      * Constructs a stack containing all the elements of <code>sourceCollection</code>.
      * The elements are pushed in the same order as they appear in <code>sourceCollection</code>.
-     * @param sourceArray the array to construct a stack from
+     * @param type the component type of the new stack
+     * @param sourceCollection the collection to construct a stack from
      */
-    public Stack(Collection<? extends T> sourceCollection) {
-        data = (T[]) sourceCollection.toArray();
+    public Stack(Class<?> type, Collection<? extends T> sourceCollection) {
+        this(type, sourceCollection.size());
+        sourceCollection.toArray(data);
         size = sourceCollection.size();
     }
 
@@ -67,7 +76,7 @@ class Stack<T> {
      * Returns the number of elements in this stack.
      * @return the number of elements in this stack
      */
-    public int count() {
+    public int size() {
         return size;
     }
 
@@ -90,12 +99,12 @@ class Stack<T> {
      */
     public void pushStack(Stack<T> other) {
         int newCapacity = data.length;
-        while (newCapacity < size + other.count()) {
+        while (newCapacity < size + other.size()) {
             newCapacity = newCapacity * GROW_FACTOR + 1;
         }
         grow(newCapacity);
-        System.arraycopy(other.data, 0, data, size, other.count());
-        size += other.count();
+        System.arraycopy(other.data, 0, data, size, other.size());
+        size += other.size();
     }
 
     /**
@@ -123,7 +132,7 @@ class Stack<T> {
 
         size -= length;
 
-        Stack<T> stack = new Stack<>(0);
+        Stack<T> stack = new Stack<>(elementType, 0);
         stack.data = Arrays.copyOfRange(data, size, size + length);
         stack.size = length;
         return stack;
