@@ -127,9 +127,9 @@ class StackTest {
     @MethodSource("singleStackParameterProvider")
     void stackIteratorTest(List<Integer> elements, Stack<Integer> stack) {
         Iterator<Integer> stackIterator = stack.iterator();
-        for (int el : elements) {
+        for (int i = elements.size() - 1; i >= 0; i--) {
             assertTrue(stackIterator.hasNext());
-            assertEquals(el, stackIterator.next());
+            assertEquals(elements.get(i), stackIterator.next());
         }
         assertFalse(stackIterator.hasNext());
     }

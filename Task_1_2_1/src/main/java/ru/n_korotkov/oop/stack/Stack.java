@@ -148,18 +148,17 @@ class Stack<T> implements Iterable<T> {
     public Iterator<T> iterator() {
         return new Iterator<T>() {
 
-            private int index = 0;
+            private int index = size;
 
             @Override
             public boolean hasNext() {
-                return index < size;
+                return index > 0;
             }
 
             @Override
             public T next() {
-                T el = data[index];
-                index++;
-                return el;
+                index--;
+                return data[index];
             }
 
         };
