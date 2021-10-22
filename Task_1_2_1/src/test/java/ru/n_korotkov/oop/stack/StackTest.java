@@ -1,12 +1,15 @@
 package ru.n_korotkov.oop.stack;
 
 import static org.junit.Assert.assertThrows;
+import static org.junit.Assert.assertTrue;
 import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.junit.jupiter.api.Assertions.assertFalse;
 import static org.junit.jupiter.api.Assertions.assertIterableEquals;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Random;
 import java.util.stream.Collectors;
@@ -118,6 +121,17 @@ class StackTest {
 
         elements.addAll(pushedElements);
         assertIterableEquals(elements, stack.toList());
+    }
+
+    @ParameterizedTest
+    @MethodSource("singleStackParameterProvider")
+    void stackIteratorTest(List<Integer> elements, Stack<Integer> stack) {
+        Iterator<Integer> stackIterator = stack.iterator();
+        for (int el : elements) {
+            assertTrue(stackIterator.hasNext());
+            assertEquals(el, stackIterator.next());
+        }
+        assertFalse(stackIterator.hasNext());
     }
 
     @Test

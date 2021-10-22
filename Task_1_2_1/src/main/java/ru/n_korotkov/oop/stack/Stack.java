@@ -3,12 +3,13 @@ package ru.n_korotkov.oop.stack;
 import java.lang.reflect.Array;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.Iterator;
 import java.util.List;
 
 /**
  * A class implementing a LIFO (last-in-first-out) collection.
  */
-class Stack<T> {
+class Stack<T> implements Iterable<T> {
 
     private static final int DEFAULT_CAPACITY = 16;
     private static final int GROW_FACTOR = 2;
@@ -16,7 +17,7 @@ class Stack<T> {
     private int size = 0;
     private T[] data;
 
-    private final Class<?> elementType;
+    private final Class<T> elementType;
 
     /**
      * Constructs a stack of given capacity.
@@ -24,7 +25,7 @@ class Stack<T> {
      * @param capacity the capacity of the new stack
      */
     @SuppressWarnings("unchecked")
-    public Stack(Class<?> type, int capacity) {
+    public Stack(Class<T> type, int capacity) {
         if (capacity < 0)
             throw new IllegalArgumentException("Given capacity is negative");
 
@@ -36,7 +37,7 @@ class Stack<T> {
      * Constructs a stack of default capacity.
      * @param type the component type of the new stack
      */
-    public Stack(Class<?> type) {
+    public Stack(Class<T> type) {
         this(type, DEFAULT_CAPACITY);
     }
 
@@ -46,7 +47,7 @@ class Stack<T> {
      * @param type the component type of the new stack
      * @param sourceCollection the collection to construct a stack from
      */
-    public Stack(Class<?> type, Collection<? extends T> sourceCollection) {
+    public Stack(Class<T> type, Collection<? extends T> sourceCollection) {
         this(type, sourceCollection.size());
         sourceCollection.toArray(data);
         size = sourceCollection.size();
@@ -141,6 +142,27 @@ class Stack<T> {
     @Override
     public String toString() {
         return Arrays.toString(Arrays.copyOf(data, size));
+    }
+
+    @Override
+    public Iterator<T> iterator() {
+        return new Iterator<T>() {
+
+            private int index = 0;
+
+            @Override
+            public boolean hasNext() {
+                return index < size;
+            }
+
+            @Override
+            public T next() {
+                T el = data[index];
+                index++;
+                return el;
+            }
+
+        };
     }
 
 }
