@@ -1,8 +1,8 @@
 package ru.n_korotkov.oop.calculator;
 
 import java.util.ArrayDeque;
-import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Collections;
 import java.util.Deque;
 import java.util.HashMap;
 import java.util.List;
@@ -20,15 +20,15 @@ class Calculator {
     class Op {
 
         private int arity;
-        private Function<List<Double>, Double> func;
+        private Function<double[], Double> func;
 
         /**
          * Constructs an operation which is calculated using the given function.
          * @param arity the number of arguments of the operation
          * @param func the function calculating the value of the operation for given parameters.
-         * The parameters are passed as a <code>List&lt;Double&gt;</code>.
+         * The parameters are passed as a <code>double[]</code>.
          */
-        public Op(int arity, Function<List<Double>, Double> func) {
+        public Op(int arity, Function<double[], Double> func) {
             this.arity = arity;
             this.func = func;
         }
@@ -38,8 +38,8 @@ class Calculator {
          * @param args the list of arguments
          * @return the value of the operation
          */
-        public double calculate(List<Double> args) {
-            if (args.size() != arity) {
+        public double calculate(double[] args) {
+            if (args.length != arity) {
                 throw new IllegalArgumentException("Incorrect number of arguments");
             }
             return func.apply(args);
@@ -57,16 +57,16 @@ class Calculator {
         // addOp(0, "e",    args -> Math.E);
         // addOp(0, "pi",   args -> Math.PI);
 
-        addOp(1, "cos",  args -> Math.cos(args.get(0)));
-        addOp(1, "log",  args -> Math.log(args.get(0)));
-        addOp(1, "sin",  args -> Math.sin(args.get(0)));
-        addOp(1, "sqrt", args -> Math.sqrt(args.get(0)));
+        addOp(1, "cos",  args -> Math.cos(args[0]));
+        addOp(1, "log",  args -> Math.log(args[0]));
+        addOp(1, "sin",  args -> Math.sin(args[0]));
+        addOp(1, "sqrt", args -> Math.sqrt(args[0]));
 
-        addOp(2, "-",    args -> args.get(0) - args.get(1));
-        addOp(2, "*",    args -> args.get(0) * args.get(1));
-        addOp(2, "/",    args -> args.get(0) / args.get(1));
-        addOp(2, "+",    args -> args.get(0) + args.get(1));
-        addOp(2, "pow",  args -> Math.pow(args.get(0), args.get(1)));
+        addOp(2, "-",    args -> args[0] - args[1]);
+        addOp(2, "*",    args -> args[0] * args[1]);
+        addOp(2, "/",    args -> args[0] / args[1]);
+        addOp(2, "+",    args -> args[0] + args[1]);
+        addOp(2, "pow",  args -> Math.pow(args[0], args[1]));
     }
 
     /**
@@ -74,9 +74,9 @@ class Calculator {
      * @param arity the number of arguments of the operation
      * @param opName the name of the operation
      * @param func the function calculating the value of the operation for given parameters.
-     * The parameters are passed as a <code>List&lt;Double&gt;</code>.
+     * The parameters are passed as a <code>double[]</code>.
      */
-    public void addOp(int arity, String opName, Function<List<Double>, Double> func) {
+    public void addOp(int arity, String opName, Function<double[], Double> func) {
         operations.put(opName, new Op(arity, func));
     }
 
@@ -87,44 +87,30 @@ class Calculator {
      */
     public double evaluate(String expr) {
         List<String> tokens = Arrays.asList(expr.trim().split(" +"));
-        Deque<Op> opStack = new ArrayDeque<>();
-        Deque<List<Double>> opArgsStack = new ArrayDeque<>();
+        Deque<Double> valueStack = new ArrayDeque<>();
 
-        // A 'sentinel' operation: when the expression is evaluated, its value is stored as a
-        // sole argument of the 'sentinel'. If there is a different number of arguments, then
-        // 'expr' is not a valid expression. 'expr' is also invalid if in 'opStack' there remain
-        // other operations besides the 'sentinel'.
-        opStack.push(new Op(2, args -> 0.0));
-        opArgsStack.push(new ArrayList<>());
-
+        Collections.reverse(tokens);
         for (String token : tokens) {
             try {
                 double value = Double.valueOf(token);
-                opArgsStack.getFirst().add(value);
+                valueStack.push(value);
             } catch (NumberFormatException e) {
-                if (operations.containsKey(token)) {
-                    opStack.push(operations.get(token));
-                    opArgsStack.push(new ArrayList<>());
+                Op operation = operations.get(token);
+                if (operation != null && operation.arity <= valueStack.size()) {
+                    double[] args = new double[operation.arity];
+                    for (int i = 0; i < operation.arity; i++) {
+                        args[i] = valueStack.pop();
+                    }
+                    valueStack.push(operation.calculate(args));
                 } else {
                     throw new IllegalArgumentException("Invalid expression");
                 }
             }
-            while (opStack.getFirst().arity == opArgsStack.getFirst().size()) {
-                Op operation = opStack.getFirst();
-                List<Double> args = opArgsStack.getFirst();
-                double result = operation.calculate(args);
-                opStack.pop();
-                opArgsStack.pop();
-                if (opStack.size() == 0) {
-                    throw new IllegalArgumentException("Invalid expression");
-                }
-                opArgsStack.getFirst().add(result);
-            }
         }
-        if (opArgsStack.getLast().size() != 1 || opStack.size() != 1) {
+        if (valueStack.size() != 1) {
             throw new IllegalArgumentException("Invalid expression");
         }
-        return opArgsStack.getFirst().get(0);
+        return valueStack.pop();
     }
 
 }
