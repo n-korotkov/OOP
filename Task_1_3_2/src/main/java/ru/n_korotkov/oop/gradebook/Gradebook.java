@@ -73,11 +73,11 @@ public class Gradebook {
             throw new IllegalArgumentException("semesterIndex out of bounds");
         }
 
-        if (semesterIndex < 3) return false;
+        if (semesterIndex < 2) return false;
         return semesterGrades
-                .subList(semesterIndex - 3, semesterIndex - 1)
+                .get(semesterIndex - 2)
+                .values()
                 .stream()
-                .flatMap(semester -> semester.values().stream())
                 .filter(grade -> grade != Grade.Passed)
                 .allMatch(grade -> grade == Grade.Excellent);
     }

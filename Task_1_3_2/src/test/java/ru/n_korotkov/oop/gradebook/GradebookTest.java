@@ -96,8 +96,7 @@ class GradebookTest {
         gradebook.setGrade(4, "discipline", Grade.Excellent);
 
         assertFalse(gradebook.increasedScholarship(1));
-        assertFalse(gradebook.increasedScholarship(2));
-
+        assertTrue(gradebook.increasedScholarship(2));
         assertTrue(gradebook.increasedScholarship(3));
         assertFalse(gradebook.increasedScholarship(4));
     }
