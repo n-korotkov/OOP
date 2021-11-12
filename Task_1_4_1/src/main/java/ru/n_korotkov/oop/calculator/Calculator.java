@@ -57,26 +57,26 @@ class Calculator {
         // addOp(0, "e",    args -> Math.E);
         // addOp(0, "pi",   args -> Math.PI);
 
-        addOp(1, "cos",  args -> Math.cos(args[0]));
-        addOp(1, "log",  args -> Math.log(args[0]));
-        addOp(1, "sin",  args -> Math.sin(args[0]));
-        addOp(1, "sqrt", args -> Math.sqrt(args[0]));
+        addOp("cos",  1, args -> Math.cos(args[0]));
+        addOp("log",  1, args -> Math.log(args[0]));
+        addOp("sin",  1, args -> Math.sin(args[0]));
+        addOp("sqrt", 1, args -> Math.sqrt(args[0]));
 
-        addOp(2, "-",    args -> args[0] - args[1]);
-        addOp(2, "*",    args -> args[0] * args[1]);
-        addOp(2, "/",    args -> args[0] / args[1]);
-        addOp(2, "+",    args -> args[0] + args[1]);
-        addOp(2, "pow",  args -> Math.pow(args[0], args[1]));
+        addOp("-",    2, args -> args[0] - args[1]);
+        addOp("*",    2, args -> args[0] * args[1]);
+        addOp("/",    2, args -> args[0] / args[1]);
+        addOp("+",    2, args -> args[0] + args[1]);
+        addOp("pow",  2, args -> Math.pow(args[0], args[1]));
     }
 
     /**
      * Adds a new operation for this <code>Calculator</code> to recognize.
-     * @param arity the number of arguments of the operation
      * @param opName the name of the operation
+     * @param arity the number of arguments of the operation
      * @param func the function calculating the value of the operation for given parameters.
      * The parameters are passed as a <code>double[]</code>.
      */
-    public void addOp(int arity, String opName, Function<double[], Double> func) {
+    public void addOp(String opName, int arity, Function<double[], Double> func) {
         operations.put(opName, new Op(arity, func));
     }
 
