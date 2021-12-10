@@ -18,7 +18,7 @@ import com.google.gson.reflect.TypeToken;
 
 public class Notebook {
 
-    static class Note {
+    public static class Note {
         String title;
         String contents;
         Note(String title, String contents) {
@@ -35,14 +35,14 @@ public class Notebook {
         }
     }
 
-    static class Serializer implements JsonSerializer<Notebook> {
+    public static class NotebookSerializer implements JsonSerializer<Notebook> {
         @Override
         public JsonElement serialize(Notebook src, Type typeOfSrc, JsonSerializationContext context) {
             return context.serialize(src.getNotes().asMap());
         }
     }
 
-    static class Deserializer implements JsonDeserializer<Notebook> {
+    public static class NotebookDeserializer implements JsonDeserializer<Notebook> {
         @Override
         public Notebook deserialize(JsonElement json, Type typeOfT, JsonDeserializationContext context)
                 throws JsonParseException {

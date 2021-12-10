@@ -32,8 +32,8 @@ public class NotebookCLI {
 
     static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern("dd.MM.yyyy HH:mm");
     static final Gson notebookGson = new GsonBuilder()
-        .registerTypeAdapter(Notebook.class, new Notebook.Serializer())
-        .registerTypeAdapter(Notebook.class, new Notebook.Deserializer())
+        .registerTypeAdapter(Notebook.class, new Notebook.NotebookSerializer())
+        .registerTypeAdapter(Notebook.class, new Notebook.NotebookDeserializer())
         .registerTypeAdapter(
             LocalDateTime.class,
             (JsonSerializer<LocalDateTime>) (src,  type, ctx) ->

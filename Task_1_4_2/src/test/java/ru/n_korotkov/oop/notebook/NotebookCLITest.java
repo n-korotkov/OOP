@@ -35,6 +35,7 @@ public class NotebookCLITest {
     static Path tempNotebookPath;
     static String fileParam;
     static ByteArrayOutputStream outputStream;
+    static ClassLoader loader = NotebookCLITest.class.getClassLoader();
 
     @BeforeAll
     static void init() {
@@ -52,12 +53,12 @@ public class NotebookCLITest {
     static Stream<Arguments> nonEmptyNotebookPathStream() {
         return Stream.of(
             arguments(
-                Path.of("sample/notes.json"),
-                Path.of("sample/notes_show.txt")
+                Path.of(loader.getResource("notes.json").getPath()),
+                Path.of(loader.getResource("notes_show.txt").getPath())
             ),
             arguments(
-                Path.of("sample/multinotes.json"),
-                Path.of("sample/multinotes_show.txt")
+                Path.of(loader.getResource("multinotes.json").getPath()),
+                Path.of(loader.getResource("multinotes_show.txt").getPath())
             )
         );
     }
@@ -67,8 +68,8 @@ public class NotebookCLITest {
             nonEmptyNotebookPathStream(),
             Stream.of(
                 arguments(
-                    Path.of("sample/empty.json"),
-                    Path.of("sample/empty_show.txt")
+                    Path.of(loader.getResource("empty.json").getPath()),
+                    Path.of(loader.getResource("empty_show.txt").getPath())
                 )
             )
         );
@@ -89,7 +90,7 @@ public class NotebookCLITest {
 
         assertEquals(CommandLine.ExitCode.OK, new CommandLine(new NotebookCLI()).execute(cliArgs));
         assertThat(tempNotebookPath).exists().isRegularFile();
-        assertThat(contentOf(tempNotebookPath.toFile())).isEqualTo(contentOf(new File("sample/empty.json")));
+        assertThat(contentOf(tempNotebookPath.toFile())).isEqualTo(contentOf(new File("src/test/resources/empty.json")));
 
         assertEquals(CommandLine.ExitCode.SOFTWARE, new CommandLine(new NotebookCLI()).execute(cliArgs));
     }
