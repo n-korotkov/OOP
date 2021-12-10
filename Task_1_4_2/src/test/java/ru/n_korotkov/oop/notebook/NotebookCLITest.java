@@ -5,7 +5,6 @@ import static org.junit.jupiter.api.Assertions.*;
 import static org.junit.jupiter.params.provider.Arguments.arguments;
 
 import java.io.ByteArrayOutputStream;
-import java.io.File;
 import java.io.PrintStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
@@ -88,9 +87,10 @@ public class NotebookCLITest {
     void createTest() {
         String[] cliArgs = new String[]{ fileParam, "-create" };
 
+        Path emptyNotebookPath = Path.of(loader.getResource("empty.json").getPath());
         assertEquals(CommandLine.ExitCode.OK, new CommandLine(new NotebookCLI()).execute(cliArgs));
         assertThat(tempNotebookPath).exists().isRegularFile();
-        assertThat(contentOf(tempNotebookPath.toFile())).isEqualTo(contentOf(new File("src/test/resources/empty.json")));
+        assertThat(contentOf(tempNotebookPath.toFile())).isEqualTo(contentOf(emptyNotebookPath.toFile()));
 
         assertEquals(CommandLine.ExitCode.SOFTWARE, new CommandLine(new NotebookCLI()).execute(cliArgs));
     }
