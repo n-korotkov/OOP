@@ -7,6 +7,7 @@ import static org.junit.jupiter.api.Assertions.assertTrue;
 
 import java.util.ConcurrentModificationException;
 import java.util.stream.Collectors;
+import java.util.stream.Stream;
 
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
@@ -15,6 +16,10 @@ public class TreeTest {
 
     static Tree<String> tree;
     static Tree<String>.Node nodeA, nodeB;
+
+    void assertStreamContent(String elems, Stream<String> stream) {
+        assertEquals(elems, stream.collect(Collectors.joining(" ")));
+    }
 
     @BeforeEach
     void initTree() {
@@ -56,36 +61,31 @@ public class TreeTest {
 
     @Test
     void leafStreamTest() {
-        assertEquals(
-            "AB BA BB",
-            tree.leafStream()
-                .filter((str) -> str.contains("B"))
-                .collect(Collectors.joining(" "))
-        );
+        assertStreamContent("AB BA BB", tree.leafStream().filter((str) -> str.contains("B")));
     }
 
     @Test
     void dfsStreamTest() {
-        assertEquals("R A AA AB B BA BB", tree.stream().collect(Collectors.joining(" ")));
+        assertStreamContent("R A AA AB B BA BB", tree.stream());
     }
 
     @Test
     void bfsStreamTest() {
-        assertEquals("R A B AA AB BA BB", tree.bfsStream().collect(Collectors.joining(" ")));
+        assertStreamContent("R A B AA AB BA BB", tree.bfsStream());
     }
 
     @Test
     void addTest() {
         tree.add("C");
-        assertEquals("R A AA AB B BA BB C", tree.stream().collect(Collectors.joining(" ")));
+        assertStreamContent("R A AA AB B BA BB C", tree.stream());
         assertEquals(8, tree.size());
 
         tree.add(nodeA, "D");
-        assertEquals("R A AA AB D B BA BB C", tree.stream().collect(Collectors.joining(" ")));
+        assertStreamContent("R A AA AB D B BA BB C", tree.stream());
         assertEquals(9, tree.size());
 
         tree.add(nodeB, "E");
-        assertEquals("R A AA AB D B BA BB E C", tree.stream().collect(Collectors.joining(" ")));
+        assertStreamContent("R A AA AB D B BA BB E C", tree.stream());
         assertEquals(10, tree.size());
         /*
                   _________R_________
@@ -99,15 +99,16 @@ public class TreeTest {
     @Test
     void removeTest() {
         assertTrue(tree.remove("AB"));
-        assertEquals("R A AA B BA BB", tree.stream().collect(Collectors.joining(" ")));
+        
+        assertStreamContent("R A AA B BA BB", tree.stream());
         assertEquals(6, tree.size());
 
         assertTrue(tree.remove("B"));
-        assertEquals("R A AA", tree.stream().collect(Collectors.joining(" ")));
+        assertStreamContent("R A AA", tree.stream());
         assertEquals(3, tree.size());
 
         assertFalse(tree.remove("C"));
-        assertEquals("R A AA", tree.stream().collect(Collectors.joining(" ")));
+        assertStreamContent("R A AA", tree.stream());
         assertEquals(3, tree.size());
         /*
             R
