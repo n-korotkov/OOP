@@ -1,0 +1,19 @@
+Benchmark                                   (cores)  Mode  Cnt  Score    Error  Units
+PrimeCheckerBenchmark.measureMultithreaded        1  avgt    3  0.430 ±  0.006   s/op
+PrimeCheckerBenchmark.measureMultithreaded        2  avgt    3  0.220 ±  0.065   s/op
+PrimeCheckerBenchmark.measureMultithreaded        3  avgt    3  0.149 ±  0.014   s/op
+PrimeCheckerBenchmark.measureMultithreaded        4  avgt    3  0.119 ±  0.045   s/op
+PrimeCheckerBenchmark.measureMultithreaded        5  avgt    3  0.100 ±  0.016   s/op
+PrimeCheckerBenchmark.measureMultithreaded        6  avgt    3  0.094 ±  0.008   s/op
+PrimeCheckerBenchmark.measureMultithreaded        7  avgt    3  0.091 ±  0.008   s/op
+PrimeCheckerBenchmark.measureMultithreaded        8  avgt    3  0.087 ±  0.007   s/op
+PrimeCheckerBenchmark.measureMultithreaded        9  avgt    3  0.083 ±  0.007   s/op
+PrimeCheckerBenchmark.measureMultithreaded       10  avgt    3  0.079 ±  0.009   s/op
+PrimeCheckerBenchmark.measureMultithreaded       11  avgt    3  0.074 ±  0.001   s/op
+PrimeCheckerBenchmark.measureMultithreaded       12  avgt    3  0.074 ±  0.001   s/op
+PrimeCheckerBenchmark.measureMultithreaded       13  avgt    3  0.074 ±  0.004   s/op
+PrimeCheckerBenchmark.measureMultithreaded       14  avgt    3  0.075 ±  0.021   s/op
+PrimeCheckerBenchmark.measureMultithreaded       15  avgt    3  0.074 ±  0.001   s/op
+PrimeCheckerBenchmark.measureMultithreaded       16  avgt    3  0.074 ±  0.001   s/op
+PrimeCheckerBenchmark.measureParallel           N/A  avgt    3  0.077 ±  0.011   s/op
+PrimeCheckerBenchmark.measureSerial             N/A  avgt    3  0.428 ±  0.012   s/op
