@@ -1,0 +1,24 @@
+{
+    "storageCapacity": 10,
+    "cooks": [
+        {
+            "cookingDelay": 10000
+        },
+        {
+            "cookingDelay": 9000
+        },
+        {
+            "cookingDelay": 8000
+        }
+    ],
+    "deliverymen": [
+        {
+            "deliveryDelay": 10000,
+            "bootCapacity": 3
+        },
+        {
+            "deliveryDelay": 5000,
+            "bootCapacity": 1
+        }
+    ]
+}
