@@ -16,6 +16,8 @@ public class Game {
     public final int INIT_SNAKE_Y = 10;
     public final int INIT_SNAKE_LENGTH = 3;
     public final int FOOD_ON_FIELD = 3;
+    public final int WALLS_ON_FIELD = 10;
+    public final int SAVEZONE_RADIUS = 3;
     public final int WIN_LENGTH = 20;
 
     private Field field;
@@ -27,7 +29,7 @@ public class Game {
         snake = new Snake(INIT_SNAKE_LENGTH, INIT_SNAKE_X, INIT_SNAKE_Y, field);
         state = State.RUNNING;
         placeFood(FOOD_ON_FIELD);
-        placeWalls(10);
+        placeWalls(WALLS_ON_FIELD);
     }
 
     public State getState() {
@@ -68,7 +70,9 @@ public class Game {
     public void placeWalls(int walls) {
         for (int i = 0; i < walls; i++) {
             Point point = field.pickEmptyPoint();
-            if (Math.abs(point.x() - INIT_SNAKE_X) > 3 || Math.abs(point.y() - INIT_SNAKE_Y) > 3) {
+            int dx = Math.abs(point.x() - INIT_SNAKE_X);
+            int dy = Math.abs(point.y() - INIT_SNAKE_Y);
+            if (dx > SAVEZONE_RADIUS || dy > SAVEZONE_RADIUS) {
                 field.setTile(point, Tile.WALL);
             }
         }
