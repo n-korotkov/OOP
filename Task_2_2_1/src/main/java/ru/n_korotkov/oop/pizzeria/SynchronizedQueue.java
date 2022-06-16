@@ -1,6 +1,8 @@
 package ru.n_korotkov.oop.pizzeria;
 
 import java.util.ArrayDeque;
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Queue;
 
 public class SynchronizedQueue<T> {
@@ -32,6 +34,18 @@ public class SynchronizedQueue<T> {
         T value = queue.remove();
         notifyAll();
         return value;
+    }
+
+    public synchronized List<T> takeAtMost(int maxElements) throws InterruptedException {
+        while (queue.isEmpty()) {
+            wait();
+        }
+        List<T> values = new ArrayList<>(maxElements);
+        for (int i = 0; i < maxElements && !queue.isEmpty(); i++) {
+            values.add(queue.remove());
+        }
+        notifyAll();
+        return values;
     }
 
     public synchronized boolean offer(T value) {
