@@ -14,6 +14,7 @@ public class Drawer {
     private final Paint PAINT_FOOD  = Paint.valueOf("red");
     private final Paint PAINT_WALL  = Paint.valueOf("white");
     private final Paint PAINT_TEXT  = Paint.valueOf("lightgrey");
+    private final Paint PAINT_TEXT_OUTLINE = Paint.valueOf("black");
 
     private final int PROGRESS_MSG_X = 10;
     private final int PROGRESS_MSG_Y = 20;
@@ -64,9 +65,15 @@ public class Drawer {
             default -> "";
         };
         String progress_msg = String.format("%d/%d", game.getSnakeLength(), game.WIN_LENGTH);
+        drawText(state_msg, STATE_MSG_X, STATE_MSG_Y);
+        drawText(progress_msg, PROGRESS_MSG_X, PROGRESS_MSG_Y);
+    }
+
+    private void drawText(String text, int x, int y) {
+        gc.setStroke(PAINT_TEXT_OUTLINE);
+        gc.strokeText(text, x, y);
         gc.setFill(PAINT_TEXT);
-        gc.fillText(state_msg, STATE_MSG_X, STATE_MSG_Y);
-        gc.fillText(progress_msg, PROGRESS_MSG_X, PROGRESS_MSG_Y);
+        gc.fillText(text, x, y);
     }
 
 }
