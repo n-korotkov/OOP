@@ -14,12 +14,12 @@ import javafx.scene.input.KeyEvent;
 
 public class GameController {
 
-    private final Duration KEYFRAME_DURATION = Duration.millis(100);
+    private final Duration KEYFRAME_DURATION = Duration.millis(200);
+    private final double speedUpRate = 1.005;
 
     private Drawer drawer;
     private Game game;
     private Timeline timeline;
-    private boolean running = false;
 
     public GameController(Scene scene, Drawer drawer) {
         this.drawer = drawer;
@@ -44,13 +44,9 @@ public class GameController {
             case UP:
                 game.changeSnakeDirection(Direction.UP);
                 break;
-            case R:
-                if (!running) {
-                    start();
-                }
-                break;
             default:
         }
+        e.consume();
     }
 
     public Field getField() {
@@ -63,16 +59,16 @@ public class GameController {
         if (game.getState() != State.RUNNING) {
             stop();
         }
+        timeline.setRate(timeline.getRate() * speedUpRate);
     }
 
-    public void start() {
-        game.init();
-        running = true;
+    public void start(int fieldWidth, int fieldHeight, double gameSpeed) {
+        timeline.setRate(gameSpeed);
+        game.init(fieldWidth, fieldHeight);
         timeline.play();
     }
 
     public void stop() {
-        running = false;
         timeline.stop();
     }
 

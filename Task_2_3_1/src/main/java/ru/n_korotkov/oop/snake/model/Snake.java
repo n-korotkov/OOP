@@ -11,6 +11,7 @@ public class Snake {
     private Deque<Point> segments;
     private Direction headDirection = Direction.UP;
     private Direction lastMoveDirection = Direction.UP;
+    private boolean alive = true;
 
     public Snake(int length, int x, int y, Field field) {
         this.field = field;
@@ -21,19 +22,31 @@ public class Snake {
         field.setTile(new Point(x, y), Tile.SNAKE);
     }
 
+    public boolean isAlive() {
+        return alive;
+    }
+
     public int getLength() {
         return segments.size();
     }
 
     public Point getHeadPoint() {
-        return segments.getLast();
+        return segments.peekLast();
+    }
+
+    public Direction getHeadDirection() {
+        return headDirection;
     }
 
     public Point getPointInFront() {
-        Point head = getHeadPoint();
-        int x = (headDirection.toPoint().x() + head.x() + field.width()) % field.width();
-        int y = (headDirection.toPoint().y() + head.y() + field.height()) % field.height();
-        return new Point(x, y);
+        if (!alive) {
+            return null;
+        }
+        return getHeadPoint().addModulo(headDirection.toPoint(), field.width(), field.height());
+    }
+
+    public boolean hasPoint(Point p) {
+        return segments.contains(p);
     }
 
     public void changeDirection(Direction direction) {
@@ -43,17 +56,41 @@ public class Snake {
     }
 
     public void advance() {
-        Point newSegment = getPointInFront();
-        Point oldSegment = segments.removeFirst();
-        lastMoveDirection = headDirection;
-        segments.addLast(newSegment);
-        field.setTile(newSegment, Tile.SNAKE);
-        field.setTile(oldSegment, Tile.EMPTY);
-        field.setTile(segments.getFirst(), Tile.SNAKE);
+        if (alive) {
+            Point newSegment = getPointInFront();
+            Point oldSegment = segments.removeFirst();
+            lastMoveDirection = headDirection;
+            segments.addLast(newSegment);
+            field.setTile(newSegment, Tile.SNAKE);
+            field.setTile(oldSegment, Tile.EMPTY);
+            field.setTile(segments.getFirst(), Tile.SNAKE);
+        }
     }
     
     public void grow() {
-        segments.addFirst(segments.getFirst());
+        if (alive) {
+            segments.addFirst(segments.getFirst());
+        }
+    }
+
+    public boolean shrink(Point cutPoint) {
+        if (!segments.contains(cutPoint)) {
+            return false;
+        }
+        Point removedSegment;
+        do {
+            removedSegment = segments.removeFirst();
+            field.setTile(removedSegment, Tile.EMPTY);
+        } while (!removedSegment.equals(cutPoint));
+
+        if (segments.isEmpty()) {
+            alive = false;
+        }
+        return true;
+    }
+
+    public void die() {
+        shrink(getHeadPoint());
     }
 
 }
