@@ -10,6 +10,5 @@ public class Student extends GroovyConfigurable {
     private String id;
     private String name;
     private String repoURL;
-    private String branch;
 
 }

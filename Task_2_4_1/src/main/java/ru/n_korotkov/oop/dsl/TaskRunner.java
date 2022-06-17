@@ -9,14 +9,24 @@ import java.util.Map;
 import com.google.common.collect.LinkedHashMultimap;
 import com.google.common.collect.Multimap;
 
-import org.bouncycastle.util.test.TestFailedException;
 import org.gradle.tooling.BuildException;
 import org.gradle.tooling.BuildLauncher;
 import org.gradle.tooling.GradleConnector;
 import org.gradle.tooling.ProjectConnection;
 import org.gradle.tooling.TestExecutionException;
-import org.gradle.tooling.TestLauncher;
+import org.gradle.tooling.events.OperationDescriptor;
+import org.gradle.tooling.events.OperationType;
+import org.gradle.tooling.events.ProgressEvent;
+import org.gradle.tooling.events.ProgressListener;
+import org.gradle.tooling.events.test.JvmTestKind;
+import org.gradle.tooling.events.test.JvmTestOperationDescriptor;
+import org.gradle.tooling.events.test.TestFailureResult;
+import org.gradle.tooling.events.test.TestFinishEvent;
+import org.gradle.tooling.events.test.TestOperationResult;
+import org.gradle.tooling.events.test.TestSkippedResult;
+import org.gradle.tooling.events.test.TestSuccessResult;
 
+import lombok.Getter;
 import ru.n_korotkov.oop.dsl.model.Assignment;
 import ru.n_korotkov.oop.dsl.model.Config;
 import ru.n_korotkov.oop.dsl.model.Student;
@@ -24,10 +34,41 @@ import ru.n_korotkov.oop.dsl.model.Task;
 
 public class TaskRunner {
 
+    private class TestProgressListener implements ProgressListener {
+
+        private @Getter int testsPassed = 0;
+        private @Getter int testsFailed = 0;
+        private @Getter int testsSkipped = 0;
+
+        public void statusChanged(ProgressEvent event) {
+            OperationDescriptor descriptor = event.getDescriptor();
+            if (event instanceof TestFinishEvent && descriptor instanceof JvmTestOperationDescriptor) {
+                if (((JvmTestOperationDescriptor) descriptor).getJvmTestKind() == JvmTestKind.ATOMIC) {
+                    TestOperationResult result = ((TestFinishEvent) event).getResult();
+                    if (result instanceof TestSuccessResult) {
+                        testsPassed++;
+                    }
+                    if (result instanceof TestFailureResult) {
+                        testsFailed++;
+                    }
+                    if (result instanceof TestSkippedResult) {
+                        testsSkipped++;
+                    }
+                }
+            }
+        }
+
+        private TestResult getResult() {
+            return new TestResult(true, testsPassed, testsFailed, testsSkipped);
+        }
+    }
+
     private Map<String, Task> tasks;
     private Multimap<String, Assignment> assignments;
+    private Repositories repos;
 
-    public TaskRunner(Config config) {
+    public TaskRunner(Config config, Repositories repos) {
+        this.repos = repos;
         tasks = new HashMap<>();
         for (Task task : config.getTasks()) {
             tasks.put(task.getId(), task);
@@ -46,7 +87,7 @@ public class TaskRunner {
             if (assignment.getStudentId() == student.getId()) {
                 Task task = tasks.get(assignment.getTaskId());
                 File taskDirectory = new File(repoDirectory, task.getId());
-                TaskResult result = evaluateTask(task, taskDirectory);
+                TaskResult result = evaluateTask(task, taskDirectory, assignment.getBranch());
                 taskResults.add(result);
                 totalScore += result.score();
             }
@@ -54,20 +95,22 @@ public class TaskRunner {
         return new StudentResult(student, true, taskResults, totalScore);
     }
 
-    private TaskResult evaluateTask(Task task, File taskDirectory) {
-        if (!taskDirectory.exists()) {
+    private TaskResult evaluateTask(Task task, File taskDirectory, String branch) {
+        boolean couldCheckout = repos.checkoutBranch(branch);
+        if (!couldCheckout || !taskDirectory.exists()) {
             System.out.printf("Could not find %s%n", task.getName());
-            return new TaskResult(task, false, false, false, 0);
+            return new TaskResult(task, false, false, null, 0);
         }
 
         ProjectConnection connection = GradleConnector
             .newConnector()
+            .useGradleVersion("7.2")
             .forProjectDirectory(taskDirectory)
             .connect();
-        
+
         float achievedScore = 0;
         boolean buildSuccessful = false;
-        boolean testSuccessful = false;
+        TestResult testResult = null;
 
         System.out.printf("Building %s: ", task.getName());
         buildSuccessful = buildTask(connection);
@@ -76,8 +119,8 @@ public class TaskRunner {
             achievedScore += task.getScore();
             if (task.isRunTests()) {
                 System.out.printf("Testing %s: ", task.getName());
-                testSuccessful = testTask(connection);
-                if (testSuccessful) {
+                testResult = testTask(connection, task.getId());
+                if (testResult.buildSuccessful() && testResult.testsFailed() == 0) {
                     System.out.printf("success%n");
                 } else {
                     System.out.printf("failure%n");
@@ -89,7 +132,7 @@ public class TaskRunner {
         }
         connection.close();
 
-        return new TaskResult(task, true, buildSuccessful, testSuccessful, achievedScore);
+        return new TaskResult(task, true, buildSuccessful, testResult, achievedScore);
     }
 
     private boolean buildTask(ProjectConnection connection) {
@@ -98,17 +141,32 @@ public class TaskRunner {
             build.run();
             return true;
         } catch (BuildException e) {
+            printThrowableCause(e);
             return false;
         }
     }
 
-    private boolean testTask(ProjectConnection connection) {
-        TestLauncher test = connection.newTestLauncher().withJvmTestClasses("*");
+    private void printThrowableCause(Throwable e) {
+        System.out.println(e.getCause().getMessage());
+    }
+
+    private TestResult testTask(ProjectConnection connection, String taskId) {
+        TestProgressListener listener = new TestProgressListener();
+        BuildLauncher test = connection
+            .newBuild()
+            .forTasks("test")
+            .withArguments("--rerun-tasks")
+            .addProgressListener(listener, OperationType.TEST);
+
         try {
             test.run();
-            return true;
-        } catch (TestFailedException | TestExecutionException | BuildException e) {
-            return false;
+            return listener.getResult();
+        } catch (TestExecutionException e) {
+            printThrowableCause(e);
+            return listener.getResult();
+        } catch (BuildException e) {
+            printThrowableCause(e);
+            return new TestResult(false, 0, 0, 0);
         }
     }
 

@@ -12,12 +12,10 @@ import ru.n_korotkov.oop.dsl.model.Student;
 public class Report {
 
     private List<StudentResult> results;
-    private String groupName;
 
     public Report(Config config) throws GitAPIException {
-        groupName = config.getGroupName();
         Repositories repos = new Repositories(config);
-        TaskRunner runner = new TaskRunner(config);
+        TaskRunner runner = new TaskRunner(config, repos);
         results = new ArrayList<>();
         for (Student student : config.getStudents()) {
             StudentResult studentResult;
@@ -32,16 +30,8 @@ public class Report {
     }
 
     public void printReport() {
-        System.out.printf("=======================%n");
-        System.out.printf("Results for group %s%n", groupName);
-        System.out.printf("=======================%n");
-        for (StudentResult studentResult : results) {
-            System.out.printf("%s:%n", studentResult.student().getName());
-            for (TaskResult taskResult : studentResult.taskResults()) {
-                System.out.printf("%-20s %.1f%n", taskResult.task().getName(), taskResult.score());
-            }
-            System.out.printf("%-20s %.1f%n%n", "Total", studentResult.totalScore());
-        }
+        ReportWriter writer = new ReportWriter(results);
+        writer.printReport();
     }
 
 }

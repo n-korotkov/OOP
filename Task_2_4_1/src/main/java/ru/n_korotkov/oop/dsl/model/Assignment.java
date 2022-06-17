@@ -9,5 +9,6 @@ public class Assignment extends GroovyConfigurable {
 
     private String studentId;
     private String taskId;
+    private String branch = "master";
 
 }

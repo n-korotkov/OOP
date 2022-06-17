@@ -2,6 +2,30 @@ package ru.n_korotkov.oop.dsl
 
 tasks = [
     {
+        id = "Task_1_1_1"
+        name = "Heap sort"
+        score = 1
+        runTests = true
+    },
+    {
+        id = "Task_1_1_2"
+        name = "String search"
+        score = 1
+        runTests = true
+    },
+    {
+        id = "Task_1_3_1"
+        name = "Heap sort"
+        score = 1
+        runTests = true
+    },
+    {
+        id = "Task_1_1_1"
+        name = "Heap sort"
+        score = 1
+        runTests = true
+    },
+    {
         id = "Task_2_1_1"
         name = "Prime numbers"
         score = 1
@@ -21,13 +45,13 @@ tasks = [
     },
     {
         id = "BuildFailingTask"
-        name = "BuildFailingTask"
+        name = "Build failing task"
         score = 1
         runTests = false
     },
     {
         id = "TestFailingTask"
-        name = "TestFailingTask"
+        name = "Test failing task"
         score = 1
         runTests = true
     }
@@ -39,17 +63,37 @@ students = [
         id = "n-korotkov"
         name = "Nikita Korotkov"
         repoURL = "https://github.com/n-korotkov/OOP.git"
-        branch = "Task_2_2_1"
     },
     {
         id = "leadpogrommer"
         name = "Ilya Merzlyakov"
         repoURL = "https://github.com/leadpogrommer/OOP.git"
-        branch = "master"
+    },
+    {
+        id = "alinaguselnikova"
+        name = "Alina Guselnikova"
+        repoURL = "https://github.com/alinaguselnikova/OOP.git"
     }
 ]
 
 assignments = [
+    {
+        studentId = "leadpogrommer"
+        taskId = "Task_1_1_1"
+    },
+    {
+        studentId = "leadpogrommer"
+        taskId = "Task_1_1_2"
+    },
+    {
+        studentId = "leadpogrommer"
+        taskId = "Task_2_1_1"
+    },
+    {
+        studentId = "leadpogrommer"
+        taskId = "Task_2_2_1"
+        branch = "doesNotExist"
+    },
     {
         studentId = "leadpogrommer"
         taskId = "Task_2_3_1"
@@ -64,11 +108,31 @@ assignments = [
     },
     {
         studentId = "n-korotkov"
+        taskId = "Task_1_1_1"
+        branch = "main"
+    },
+    {
+        studentId = "n-korotkov"
+        taskId = "Task_1_1_2"
+        branch = "main"
+    },
+    {
+        studentId = "n-korotkov"
         taskId = "Task_2_1_1"
+        branch = "Task_2_2_1"
     },
     {
         studentId = "n-korotkov"
         taskId = "Task_2_2_1"
+        branch = "Task_2_2_1"
+    },
+    {
+        studentId = "alinaguselnikova"
+        taskId = "Task_1_1_1"
+    },
+    {
+        studentId = "alinaguselnikova"
+        taskId = "Task_2_3_1"
     }
 ]
 
