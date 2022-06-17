@@ -1,5 +1,8 @@
 package ru.n_korotkov.oop.snake.model;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import ru.n_korotkov.oop.snake.model.Field.Tile;
 
 public class Game {
@@ -10,23 +13,36 @@ public class Game {
         LOSE
     };
 
-    public final int FIELD_WIDTH = 21;
-    public final int FIELD_HEIGHT = 21;
-    public final int INIT_SNAKE_X = 10;
-    public final int INIT_SNAKE_Y = 10;
     public final int INIT_SNAKE_LENGTH = 3;
     public final int FOOD_ON_FIELD = 3;
     public final int WALLS_ON_FIELD = 10;
     public final int SAVEZONE_RADIUS = 3;
     public final int WIN_LENGTH = 20;
+    public final int HUNGRY_ENEMIES = 1;
+    public final int OBLIVIOUS_ENEMIES = 2;
 
     private Field field;
-    private Snake snake;
+    private Snake playerSnake;
+    private List<Snake> snakes = new ArrayList<>();
+    private List<SnakeAI> enemies = new ArrayList<>();
     private State state;
 
-    public void init() {
-        field = new Field(FIELD_WIDTH, FIELD_HEIGHT);
-        snake = new Snake(INIT_SNAKE_LENGTH, INIT_SNAKE_X, INIT_SNAKE_Y, field);
+    public void init(int fieldWidth, int fieldHeight) {
+        field = new Field(fieldWidth, fieldHeight);
+        playerSnake = new Snake(INIT_SNAKE_LENGTH, fieldWidth / 2, fieldHeight / 2, field);
+        snakes.add(playerSnake);
+        for (int i = 0; i < HUNGRY_ENEMIES; i++) {
+            Point startingPoint = field.pickEmptyPoint();
+            Snake enemySnake = new Snake(INIT_SNAKE_LENGTH, startingPoint.x(), startingPoint.y(), field);
+            snakes.add(enemySnake);
+            enemies.add(new HungryAI(field, enemySnake));
+        }
+        for (int i = 0; i < OBLIVIOUS_ENEMIES; i++) {
+            Point startingPoint = field.pickEmptyPoint();
+            Snake enemySnake = new Snake(INIT_SNAKE_LENGTH, startingPoint.x(), startingPoint.y(), field);
+            snakes.add(enemySnake);
+            enemies.add(new ObliviousAI(field, enemySnake));
+        }
         state = State.RUNNING;
         placeFood(FOOD_ON_FIELD);
         placeWalls(WALLS_ON_FIELD);
@@ -40,8 +56,9 @@ public class Game {
         return field;
     }
 
-    public void tick() {
-        Tile tileInFront = field.getTile(snake.getPointInFront());
+    public void moveSnake(Snake snake) {
+        Point pointInFront = snake.getPointInFront();
+        Tile tileInFront = field.getTile(pointInFront);
         switch (tileInFront) {
             case EMPTY:
                 snake.advance();
@@ -50,14 +67,35 @@ public class Game {
                 snake.grow();
                 snake.advance();
                 placeFood(1);
-                if (snake.getLength() == WIN_LENGTH) {
-                    state = State.WIN;
-                }
                 break;
             case SNAKE:
-            case WALL:
-                state = State.LOSE;
+                for (Snake otherSnake : snakes) {
+                    if (otherSnake.isAlive()) {
+                        if (otherSnake.shrink(pointInFront)) {
+                            break;
+                        }
+                    }
+                }
+                snake.advance();
                 break;
+            case WALL:
+                snake.die();
+                break;
+        }
+    }
+
+    public void tick() {
+        moveSnake(playerSnake);
+        for (SnakeAI enemy : enemies) {
+            if (enemy.getSnake().isAlive()) {
+                enemy.makeTurn();
+                moveSnake(enemy.getSnake());
+            }
+        }
+        if (!playerSnake.isAlive()) {
+            state = State.LOSE;
+        } else if (playerSnake.getLength() == WIN_LENGTH) {
+            state = State.WIN;
         }
     }
 
@@ -70,8 +108,8 @@ public class Game {
     public void placeWalls(int walls) {
         for (int i = 0; i < walls; i++) {
             Point point = field.pickEmptyPoint();
-            int dx = Math.abs(point.x() - INIT_SNAKE_X);
-            int dy = Math.abs(point.y() - INIT_SNAKE_Y);
+            int dx = Math.abs(point.x() - field.width() / 2);
+            int dy = Math.abs(point.y() - field.height() / 2);
             if (dx > SAVEZONE_RADIUS || dy > SAVEZONE_RADIUS) {
                 field.setTile(point, Tile.WALL);
             }
@@ -79,11 +117,11 @@ public class Game {
     }
 
     public int getSnakeLength() {
-        return snake.getLength();
+        return playerSnake.getLength();
     }
 
     public void changeSnakeDirection(Direction direction) {
-        snake.changeDirection(direction);
+        playerSnake.changeDirection(direction);
     }
 
 }

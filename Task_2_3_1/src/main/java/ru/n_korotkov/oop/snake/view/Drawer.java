@@ -21,8 +21,8 @@ public class Drawer {
     private final int STATE_MSG_X = 10;
     private final int STATE_MSG_Y = 40;
 
-    private final String WIN_MESSAGE = "You won. Press R to restart.";
-    private final String LOSE_MESSAGE = "You lost. Press R to restart.";
+    private final String WIN_MESSAGE = "You won.";
+    private final String LOSE_MESSAGE = "You lost.";
 
     private GraphicsContext gc;
 
